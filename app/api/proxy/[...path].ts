@@ -18,15 +18,22 @@ export default async function handler(
   });
   headers["user-agent"] =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  headers["referer"] = "https://satoshi.blogs.com/";
+  headers["origin"] = "https://satoshi.blogs.com";
 
-  // fetchでプロキシ先へリクエスト
-  const response = await fetch(targetUrl, {
-    method: req.method,
-    headers,
-  });
+  try {
+    // fetchでプロキシ先へリクエスト
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers,
+    });
 
-  // レスポンスをそのまま返す
-  res.status(response.status);
-  const data = await response.arrayBuffer();
-  res.send(Buffer.from(data));
+    // レスポンスをそのまま返す
+    res.status(response.status);
+    const data = await response.arrayBuffer();
+    res.send(Buffer.from(data));
+  } catch (error) {
+    console.error("Proxy error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 }
